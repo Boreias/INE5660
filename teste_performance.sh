@@ -35,6 +35,105 @@ gfortran -g -O3 -march=native ModuleGlobalData.F90 TCCModule.F90 TCCMain.F90 -o 
 cd ../../../
 
 
+# Cria diretórios para salvar os dados
+cd ./Data
+mkdir Intermediary
+mkdir Output
+
+cd ./Output
+mkdir Fortran
+mkdir Rust
+
+cd ./Fortran
+mkdir Duration
+mkdir General
+mkdir General_without_Print
+
+cd ./Duration
+mkdir Execution_Result_File
+
+cd ../General
+mkdir Execution_Result_File
+
+cd ../General_without_Print
+mkdir Execution_Result_File
+
+cd ../../Rust
+mkdir Duration
+mkdir General
+mkdir General_without_Print
+
+cd ./Duration
+mkdir Sequencial
+mkdir Parallel
+
+cd ./Sequencial
+mkdir Execution_Result_File
+
+cd ../Parallel
+mkdir "2"
+mkdir "3"
+mkdir "4"
+mkdir "5"
+mkdir "6"
+mkdir "7"
+mkdir "8"
+mkdir "9"
+mkdir "10"
+mkdir "11"
+mkdir "12"
+mkdir "13"
+mkdir "14"
+mkdir "15"
+mkdir "16"
+mkdir "17"
+mkdir "18"
+mkdir "19"
+mkdir "20"
+mkdir Execution_Result_File
+
+cd ../../General
+mkdir Sequencial
+mkdir Parallel
+
+cd ./Sequencial
+mkdir Execution_Result_File
+
+cd ../Parallel
+mkdir "2"
+mkdir "3"
+mkdir "4"
+mkdir "5"
+mkdir "6"
+mkdir "7"
+mkdir "8"
+mkdir "9"
+mkdir "10"
+mkdir "11"
+mkdir "12"
+mkdir "13"
+mkdir "14"
+mkdir "15"
+mkdir "16"
+mkdir "17"
+mkdir "18"
+mkdir "19"
+mkdir "20"
+mkdir Execution_Result_File
+
+cd ../../General_without_Print
+mkdir Sequencial
+mkdir Parallel
+
+cd ./Sequencial
+mkdir Execution_Result_File
+
+cd ../Parallel
+mkdir Execution_Result_File
+
+cd ../../../../../
+
+
 # Preparação dos dados intermediários
 FORTRAN_PREPARE_DATA="./Fortran/Prepare_Data/tcc"
 
