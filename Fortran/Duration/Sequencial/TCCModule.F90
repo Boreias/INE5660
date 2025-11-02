@@ -253,7 +253,7 @@ Module TCCModule
         !----------------------------------------------------------------------
         call system_clock(end_total_clock)
 
-        call export_triangulation_to_txt(Me, input_filename, &
+        call export_triangulation_to_txt(Me, TriangulationID, input_filename, &
                 real(end_total_clock - start_total_clock) / real(rate), &
                 real(end_ConstructNodes_clock - start_ConstructNodes_clock) / real(rate), &
                 real(end_ConstructTriangles_clock - start_ConstructTriangles_clock) / real(rate), &
@@ -758,29 +758,41 @@ doEdge:     do iE = 1, 2 * Me%NumberOfArcs
       return
     end function nbcnt
 
-    subroutine export_triangulation_to_txt(triangulation, filename, &
+    subroutine export_triangulation_to_txt(triangulation, case, filename, &
             total_duration, ConstructNodes_duration, ConstructTriangles_duration, ConstructDirectedEdges_duration)
       use iso_fortran_env, only: int32, real64
       implicit none
+      integer                           :: case
       type(T_Triangulation), intent(in) :: triangulation
       character(len=100)                :: filename, data_path, full_path
+      character(len=200)                :: final_name
+      character(len=20)                 :: case_str
       integer :: i, j, unit
       real :: total_duration, ConstructNodes_duration, ConstructTriangles_duration, ConstructDirectedEdges_duration
 
     !   data_path = "../../../Data/Output/Fortran/Duration/" ! Sem executar pelo arquivo .sh
       data_path = "./Data/Output/Fortran/Duration/" ! Executando pelo arquivo .sh
 
-      full_path = trim(data_path) // trim(filename)
+      write(case_str, '(I10)') case
+
+      final_name = adjustl(trim(case_str)) // "_" // trim(filename)
+
+      full_path = trim(data_path) // trim(final_name)
+
+      print *, "Tempo do ConstructNodes: ", ConstructNodes_duration
+      print *, "Tempo do ConstructTriangles: ", ConstructTriangles_duration
+      print *, "Tempo do ConstructDirectedEdges: ", ConstructDirectedEdges_duration
+      print *, "Tempo Total: ", total_duration
 
       unit = 99
       open(unit=unit, file=full_path, status="replace", action="write")
 
       write(unit,*) "T_Triangulation:"
       write(unit,*) "  instance_id:", triangulation%InstanceID
-      write(unit,*) "  Total_Duration:", total_duration
-      write(unit,*) "  ConstructNodes_Duration:", ConstructNodes_duration
-      write(unit,*) "  ConstructTriangles_Duration:", ConstructTriangles_duration
-      write(unit,*) "  ConstructDirectedEdges_Duration:", ConstructDirectedEdges_duration
+      write(unit,*) "  total_duration:", total_duration
+      write(unit,*) "  construct_nodes_duration:", ConstructNodes_duration
+      write(unit,*) "  construct_triangle_duration:", ConstructTriangles_duration
+      write(unit,*) "  construct_directed_edge_duration:", ConstructDirectedEdges_duration
       write(unit,*) "  number_of_nodes:", triangulation%NumberOfNodes
       write(unit,*) "  number_of_triangles:", triangulation%NumberOfTriangles
       write(unit,*) "  number_of_arcs:", triangulation%NumberOfArcs
@@ -795,7 +807,7 @@ doEdge:     do iE = 1, 2 * Me%NumberOfArcs
         if (associated(triangulation%Nodes)) then
             write(unit,*) ""
             write(unit,*) "Nodes:"
-            do i = 1, triangulation%NumberOfNodes
+            do i = 1, size(triangulation%Nodes)
                 write(unit,*) "  Node", i, "-> x:", triangulation%Nodes(i)%X, &
                     " y:", triangulation%Nodes(i)%Y, &
                     " z:", triangulation%Nodes(i)%Z, &
@@ -810,7 +822,7 @@ doEdge:     do iE = 1, 2 * Me%NumberOfArcs
         if (associated(triangulation%DirectedEdges)) then
             write(unit,*) ""
             write(unit,*) "DirectedEdges:"
-            do i = 1, triangulation%NumberOfArcs
+            do i = 1, size(triangulation%DirectedEdges)
                 write(unit,*) "  Edge", i, "-> id:", triangulation%DirectedEdges(i)%EdgeID, &
                     " start:", triangulation%DirectedEdges(i)%StartNode, &
                     " end:", triangulation%DirectedEdges(i)%EndNode, &
@@ -826,7 +838,7 @@ doEdge:     do iE = 1, 2 * Me%NumberOfArcs
         if (associated(triangulation%Triangles)) then
             write(unit,*) ""
             write(unit,*) "Triangles:"
-            do i = 1, triangulation%NumberOfTriangles
+            do i = 1, size(triangulation%Triangles)
                 write(unit,*) "  Triangle", i, "-> center_x:", triangulation%Triangles(i)%CenterX, &
                     " center_y:", triangulation%Triangles(i)%CenterY, &
                     " radius:", triangulation%Triangles(i)%Radius, &

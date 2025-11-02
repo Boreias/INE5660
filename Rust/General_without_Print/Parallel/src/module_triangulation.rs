@@ -55,7 +55,7 @@ struct TReach {
 
 #[derive(Debug, Clone)]
 pub struct TTriangulation {
-    instance_id: i32,
+    instance_id: usize,
     xt: Vec<f32>,
     yt: Vec<f32>,
     zt: Vec<f32>,
@@ -90,7 +90,7 @@ pub struct TTriangulation {
 impl TTriangulation {
 
     pub fn construct_triangulation_xyz(
-        triangulation_id: i32,
+        triangulation_id: usize,
         number_of_threads: usize,
         mut number_of_nodes: usize,
         mut node_x: Vec<f32>,

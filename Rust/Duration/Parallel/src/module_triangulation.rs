@@ -1,11 +1,10 @@
 use std::i32;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use std::fs::File;
 use std::io::{Write, Result};
 use std::path::Path;
 
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
@@ -55,7 +54,7 @@ struct TReach {
 
 #[derive(Debug, Clone)]
 pub struct TTriangulation {
-    instance_id: i32,
+    instance_id: usize,
     xt: Vec<f32>,
     yt: Vec<f32>,
     zt: Vec<f32>,
@@ -90,7 +89,7 @@ pub struct TTriangulation {
 impl TTriangulation {
 
     pub fn construct_triangulation_xyz(
-        triangulation_id: i32,
+        triangulation_id: usize,
         number_of_threads: usize,
         mut number_of_nodes: usize,
         mut node_x: Vec<f32>,
@@ -199,7 +198,7 @@ impl TTriangulation {
             .expect("failed to build rayon pool");
 
         let number_of_triangles = self.number_of_triangles;
-        let expected_candidates = (number_of_triangles as usize) * 6;
+        let expected_candidates = number_of_triangles * 6;
 
         #[derive(Clone)]
         struct EdgeCand {
@@ -515,9 +514,9 @@ impl TTriangulation {
         construct_triangle_duration: Duration,
         construct_directed_edge_duration: Duration
     ) -> Result<()> {
-        // let data_path = format!("{}{}/","../../../Data/Output/Rust/Duration/Parallel/", number_of_threads.to_string());
-        let data_path = format!("{}{}/","./Data/Output/Rust/Duration/Parallel/", number_of_threads.to_string());
-        let adjusted_filename = format!("{}_{}", self.instance_id.to_string(), filename);
+        // let data_path = "../../../Data/Output/Rust/Duration/Parallel".to_string();
+        let data_path = "./Data/Output/Rust/Duration/Parallel".to_string();
+        let adjusted_filename = format!("{}_{}_{}", number_of_threads.to_string(), filename, self.instance_id.to_string());
         let input_path = Path::new(&data_path).join(&adjusted_filename);
 
         let formated_total_duration = format!("{:?}", total_duration);
