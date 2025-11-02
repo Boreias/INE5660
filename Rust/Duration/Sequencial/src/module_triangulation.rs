@@ -184,6 +184,18 @@ impl TTriangulation {
 
     fn construct_directed_edges(&mut self) {
 
+        self.directed_edges = vec![TDirectedEdge {
+            edge_id: 0,
+            start_node: 0,
+            end_node: 0,
+            voronoi_x: 0.0,
+            voronoi_y: 0.0,
+            length: 0.,
+            slope: 0.,
+            boundary: false,
+            counter_clock_edge: None,
+        }; 2 * self.number_of_arcs];
+
         let mut edge_so_far: usize = 0;
 
         for it in 0..self.number_of_triangles {
@@ -199,20 +211,16 @@ impl TTriangulation {
             let e2 = self.ltri[7][it];
             let e3 = self.ltri[8][it];
 
-            if !self.already_in_list(&edge_so_far, v2, v3) && edge_so_far < self.number_of_arcs {
+            if !self.already_in_list(&edge_so_far, v2, v3) {
                 self.add_edge(&mut edge_so_far, e1, v2, v3, n1, it);
             }
 
-            if !self.already_in_list(&edge_so_far, v3, v1 ) && edge_so_far < self.number_of_arcs {
+            if !self.already_in_list(&edge_so_far, v3, v1 ) {
                 self.add_edge(&mut edge_so_far, e2, v3, v1, n2, it);
             }
 
-            if !self.already_in_list(&edge_so_far, v1, v2) && edge_so_far < self.number_of_arcs {
+            if !self.already_in_list(&edge_so_far, v1, v2) {
                 self.add_edge(&mut edge_so_far, e3, v1, v2, n3, it);
-            }
-
-            if self.directed_edges.len() >= self.number_of_arcs {
-                break;
             }
         }
 
@@ -286,7 +294,7 @@ impl TTriangulation {
         return false;
     }
 
-    fn add_edge(&mut self, edge_so_far: &mut usize, edge_id: usize, start_node: usize, end_node: usize, nb: usize, it: usize) {// fn add_edge(&self, directed_edges: &mut Vec<TDirectedEdge>, edge_so_far: &mut usize, edge_id: usize, start_node: usize, end_node: usize, nb: usize, it: usize) {
+    fn add_edge(&mut self, edge_so_far: &mut usize, edge_id: usize, start_node: usize, end_node: usize, nb: usize, it: usize) {
 
         let dx = self.nodes[start_node - 1].x - self.nodes[end_node - 1].x;
         let dy = self.nodes[start_node - 1].y - self.nodes[end_node - 1].y;
@@ -301,17 +309,12 @@ impl TTriangulation {
             boundary_edge = true;
         }
 
-        self.directed_edges.push(TDirectedEdge {
-            edge_id: edge_id,
-            start_node: start_node,
-            end_node: end_node,
-            voronoi_x: 0.0,
-            voronoi_y: 0.0,
-            length,
-            slope,
-            boundary: boundary_edge,
-            counter_clock_edge: None,
-        });
+        self.directed_edges[*edge_so_far].edge_id = edge_id;
+        self.directed_edges[*edge_so_far].start_node = start_node;
+        self.directed_edges[*edge_so_far].end_node = end_node;
+        self.directed_edges[*edge_so_far].length = length;
+        self.directed_edges[*edge_so_far].slope = slope;
+        self.directed_edges[*edge_so_far].boundary = boundary_edge;
 
         if nb != 0 {
             self.directed_edges[*edge_so_far].voronoi_x = self.triangles[nb - 1].center_x;
@@ -321,21 +324,18 @@ impl TTriangulation {
             self.directed_edges[*edge_so_far].voronoi_y = f32::NAN;
         }
 
-        if self.directed_edges.len() < self.number_of_arcs {
-            
-            self.directed_edges.push(TDirectedEdge {
-                edge_id: edge_id,
-                start_node: end_node,
-                end_node: start_node,
-                voronoi_x: self.triangles[it as usize].center_x,
-                voronoi_y: self.triangles[it as usize].center_y,
-                length,
-                slope: -slope,
-                boundary: boundary_edge,
-                counter_clock_edge: None,
-            });
-        }
-        *edge_so_far = self.directed_edges.len();
+        *edge_so_far += 1;
+
+        self.directed_edges[*edge_so_far].edge_id = edge_id;
+        self.directed_edges[*edge_so_far].start_node = end_node;
+        self.directed_edges[*edge_so_far].end_node = start_node;
+        self.directed_edges[*edge_so_far].voronoi_x = self.triangles[it].center_x;
+        self.directed_edges[*edge_so_far].voronoi_y = self.triangles[it].center_y;
+        self.directed_edges[*edge_so_far].length = length;
+        self.directed_edges[*edge_so_far].slope = -slope;
+        self.directed_edges[*edge_so_far].boundary = boundary_edge;
+
+        *edge_so_far += 1;
     }
 
     fn construct_nodes (&mut self, node_x: &Vec<f32>, node_y: &Vec<f32>, node_z: &Vec<f32>) {

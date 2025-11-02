@@ -55,7 +55,7 @@ struct TReach {
 
 #[derive(Debug, Clone)]
 pub struct TTriangulation {
-    instance_id: i32,
+    instance_id: usize,
     xt: Vec<f32>,
     yt: Vec<f32>,
     zt: Vec<f32>,
@@ -90,7 +90,7 @@ pub struct TTriangulation {
 impl TTriangulation {
 
     pub fn construct_triangulation_xyz(
-        triangulation_id: i32,
+        triangulation_id: usize,
         number_of_threads: usize,
         mut number_of_nodes: usize,
         mut node_x: Vec<f32>,
@@ -490,9 +490,9 @@ impl TTriangulation {
         filename: &str,
         number_of_threads: usize
     ) -> Result<()> {
-        // let data_path = format!("{}{}/","../../../Data/Output/Rust/General/Parallel/", number_of_threads.to_string());
-        let data_path = format!("{}{}/","./Data/Output/Rust/General/Parallel/", number_of_threads.to_string());
-        let adjusted_filename = format!("{}_{}", self.instance_id.to_string(), filename);
+        // let data_path = "../../../Data/Output/Rust/General/Parallel".to_string();
+        let data_path = "./Data/Output/Rust/General/Parallel".to_string();
+        let adjusted_filename = format!("{}_{}_{}", number_of_threads.to_string(), filename, self.instance_id.to_string());
         let input_path = Path::new(&data_path).join(&adjusted_filename);
 
         let mut file = File::create(input_path)?;
