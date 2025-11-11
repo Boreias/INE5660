@@ -14,19 +14,10 @@ cargo build --release
 cd ../Parallel || exit
 cargo build --release
 
-cd ../../General_without_Print/Sequencial || exit
-cargo build --release
-
-cd ../Parallel || exit
-cargo build --release
-
 cd ../../../Fortran/Duration/Sequencial
 gfortran -g -O3 -march=native ModuleGlobalData.F90 TCCModule.F90 TCCMain.F90 -o tcc
 
 cd ../../General/Sequencial
-gfortran -g -O3 -march=native ModuleGlobalData.F90 TCCModule.F90 TCCMain.F90 -o tcc
-
-cd ../../General_without_Print
 gfortran -g -O3 -march=native ModuleGlobalData.F90 TCCModule.F90 TCCMain.F90 -o tcc
 
 cd ../Prepare_Data
@@ -61,7 +52,6 @@ mkdir Execution_Result_File
 cd ../../Rust
 mkdir Duration
 mkdir General
-mkdir General_without_Print
 
 cd ./Duration
 mkdir Sequencial
@@ -83,16 +73,6 @@ mkdir Execution_Result_File
 cd ../Parallel
 mkdir Execution_Result_File
 
-cd ../../General_without_Print
-mkdir Sequencial
-mkdir Parallel
-
-cd ./Sequencial
-mkdir Execution_Result_File
-
-cd ../Parallel
-mkdir Execution_Result_File
-
 cd ../../../../../
 
 
@@ -105,12 +85,9 @@ RUST_SEQUENCIAL_DURATION_EXEC="./Rust/Duration/Sequencial/target/release/Sequenc
 RUST_PARALLEL_DURATION_EXEC="./Rust/Duration/Parallel/target/release/Parallel"
 RUST_SEQUENCIAL_GENERAL_EXEC="./Rust/General/Sequencial/target/release/Sequencial"
 RUST_PARALLEL_GENERAL_EXEC="./Rust/General/Parallel/target/release/Parallel"
-RUST_SEQUENCIAL_GENERAL_WITHOUT_PRINT_EXEC="./Rust/General_without_Print/Sequencial/target/release/Sequencial"
-RUST_PARALLEL_GENERAL_WITHOUT_PRINT_EXEC="./Rust/General_without_Print/Parallel/target/release/Parallel"
 
 FORTRAN_DURATION_EXEC="./Fortran/Duration/Sequencial/tcc"
 FORTRAN_GENERAL_EXEC="./Fortran/General/Sequencial/tcc"
-FORTRAN_GENERAL_WITHOUT_PRINT_EXEC="./Fortran/General_without_Print/tcc"
 
 # Parâmetros de teste
 INPUT_PARAMS=(
@@ -204,43 +181,6 @@ for CASE in "${CASE_NUMBER[@]}"; do
 
             perf stat -e cpu-clock,cycles,cache-misses,cache-references,branch-misses,branches,power/energy-pkg/,power/energy-ram/,page-faults \
                 $RUST_PARALLEL_GENERAL_EXEC $CASE $THREAD $INPUT >> "Data/Output/Rust/General/Parallel/Execution_Result_File/${ID}.txt" 2>&1
-        done
-    done
-done
-
-
-for CASE in "${CASE_NUMBER[@]}"; do
-    for INPUT in "${INPUT_PARAMS[@]}"; do
-        NUMERO="${INPUT%.*}"
-        ID="${NUMERO}_${CASE}"
-
-        perf stat -e cpu-clock,cycles,cache-misses,cache-references,branch-misses,branches,power/energy-pkg/,power/energy-ram/,page-faults \
-            $RUST_SEQUENCIAL_GENERAL_WITHOUT_PRINT_EXEC $CASE $INPUT >> "Data/Output/Rust/General_without_Print/Sequencial/Execution_Result_File/${ID}.txt" 2>&1
-
-    done
-done
-
-
-for CASE in "${CASE_NUMBER[@]}"; do
-    for INPUT in "${INPUT_PARAMS[@]}"; do
-        NUMERO="${INPUT%.*}"
-        ID="${NUMERO}_${CASE}"
-
-        perf stat -e cpu-clock,cycles,cache-misses,cache-references,branch-misses,branches,power/energy-pkg/,power/energy-ram/,page-faults \
-            $FORTRAN_GENERAL_WITHOUT_PRINT_EXEC $CASE $INPUT >> "Data/Output/Fortran/General_without_Print/Execution_Result_File/${ID}.txt" 2>&1
-
-    done
-done
-
-
-for CASE in "${CASE_NUMBER[@]}"; do
-    for THREAD in "${NUMBER_OF_THREADS[@]}"; do
-        for INPUT in "${INPUT_PARAMS[@]}"; do
-            NUMERO="${INPUT%.*}"
-            ID="${THREAD}_${NUMERO}_${CASE}"
-
-            perf stat -e cpu-clock,cycles,cache-misses,cache-references,branch-misses,branches,power/energy-pkg/,power/energy-ram/,page-faults \
-                $RUST_PARALLEL_GENERAL_WITHOUT_PRINT_EXEC $CASE $THREAD $INPUT >> "Data/Output/Rust/General_without_Print/Parallel/Execution_Result_File/${ID}.txt" 2>&1
         done
     done
 done
